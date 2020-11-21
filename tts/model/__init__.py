@@ -1,0 +1,2 @@
+from .tacotron import tacotron
+

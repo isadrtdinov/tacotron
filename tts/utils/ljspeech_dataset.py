@@ -11,9 +11,9 @@ class LJSpeechDataset(torch.utils.data.Dataset):
                                          key=lambda column: column.str.len())
 
         self.data_root = params.data_root
-        self.max_audio_length = max_audio_length
-        self.max_chars_length = max_chars_length
-        self.sample_rate = sample_rate
+        self.max_audio_length = params.max_audio_length
+        self.max_chars_length = params.max_chars_length
+        self.sample_rate = params.sample_rate
 
     def pad_sequence(self, sequence, max_length, fill=0.0, dtype=torch.float):
         padded_sequence = torch.full((max_length, ), fill_value=fill, dtype=dtype)
@@ -26,7 +26,7 @@ class LJSpeechDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         audio_info = self.labels.loc[index]
-        waveform, sample_rate = torchaudio.load(self.root + audio_info.path + '.wav')
+        waveform, sample_rate = torchaudio.load(self.data_root + audio_info.path + '.wav')
 
         if sample_rate != self.sample_rate:
             raise ValueError('Wrong sample rate!')

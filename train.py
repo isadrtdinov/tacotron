@@ -1,5 +1,7 @@
 import os
+import sys
 import string
+import warnings
 import wandb
 import torch
 import torchvision
@@ -19,6 +21,9 @@ def main():
     # set params and random seed
     params = set_params()
     set_random_seed(params.random_seed)
+    sys.path.append(params.vocoder_dir)
+    warnings.filterwarnings('ignore')
+
     params.device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     if params.verbose:
         print('Using device', params.device)
@@ -32,10 +37,8 @@ def main():
         print('Data loaded and split')
 
     # prepare dataloaders
-    train_dataset = LJSpeechDataset(root=params.data_root, labels=train_data,
-                                    alphabet=alphabet, params=params)
-    valid_dataset = LJSpeechDataset(root=params.data_root, labels=valid_data,
-                                    alphabet=alphabet, params=params)
+    train_dataset = LJSpeechDataset(labels=train_data, alphabet=alphabet, params=params)
+    valid_dataset = LJSpeechDataset(labels=valid_data, alphabet=alphabet, params=params)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=params.batch_size,
                                                num_workers=params.num_workers, pin_memory=True)

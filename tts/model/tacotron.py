@@ -30,7 +30,7 @@ class Tacotron(nn.Module):
         encoder_outputs = self.encoder(chars, lengths)
         # encoder_outputs: (batch_size, char_length, embed_dim)
 
-        decoder_melspecs, decoder_probs = self.decoder(chars, lengths, melspecs)
+        decoder_melspecs, decoder_probs = self.decoder(encoder_outputs, lengths, melspecs)
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 
@@ -46,7 +46,7 @@ class Tacotron(nn.Module):
         encoder_outputs = self.encoder(chars, lengths)
         # encoder_outputs: (batch_size, char_length, embed_dim)
 
-        decoder_melspecs, decoder_probs = self.decoder.inference(chars, lengths)
+        decoder_melspecs, decoder_probs = self.decoder.inference(encoder_outputs, lengths)
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 

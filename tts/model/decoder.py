@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 from .attention import Attention
 from .feedforward import PreNet
@@ -25,7 +26,7 @@ class Decoder(nn.Module):
 
         self.attention = Attention(embed_dim, attention_dim, attention_lstm_dim,
                                    attention_temp, attention_dropout)
-        self.decoder_lstm = nn.LSTMCell(input_size=attention_lstm + embed_dim,
+        self.decoder_lstm = nn.LSTMCell(input_size=attention_lstm_dim + embed_dim,
                                         hidden_size=decoder_lstm_dim)
 
         self.spec_fc = nn.Linear(in_features=decoder_lstm_dim + embed_dim,
@@ -71,7 +72,7 @@ class Decoder(nn.Module):
         # V: (batch_size, char_length, embed_dim)
 
         mask = torch.arange(char_length).view(1, char_length) >= lengths.view(batch_size, 1)
-        mask = mask.unsqueeze(1)
+        mask = mask.unsqueeze(1).to(device)
         # mask: (batch_size, 1, char_length)
 
         output_melspecs, output_probs = [], []
@@ -101,7 +102,7 @@ class Decoder(nn.Module):
             # frame_features: (batch_size, decoder_lstm_dim + embed_dim)
 
             decoder_outputs = self.spec_fc(frame_features)
-            stop_probs = self.stop_fc(frame_features)
+            stop_probs = torch.sigmoid(self.stop_fc(frame_features))
             # decoder_outputs: (batch_size, num_mels)
             # stop_probs: (batch_size, 1)
 

@@ -1,67 +1,69 @@
 class Params:
     # the most important parameter
-    self.random_state = 800008
+    random_seed = 800008
 
     # system params
-    self.verbose = True
-    self.num_workers = 8
-    self.device = None # to be set during runtime
+    verbose = True
+    num_workers = 8
+    device = None # to be set during runtime
+    vocoder_file = 'vocoder.pt'
+    vocoder_dir = 'waveglow/'
 
     # wandb params
-    self.use_wandb = False
-    self.wandb_project = 'tacotron'
-    self.num_examples = 5
-    self.vocoder_file = 'vocoder.pt'
+    use_wandb = False
+    wandb_project = 'tacotron'
+    num_examples = 5
 
     # data location
-    self.data_root = 'ljspeech/wavs/'
-    self.metadata_file = 'ljspeech/metadata.csv'
+    data_root = 'ljspeech/wavs/'
+    metadata_file = 'ljspeech/metadata.csv'
 
     # checkpoints
-    self.checkpoint_dir = 'checkpoints/'
-    self.checkpoint_template = 'checkpoints/tacotron{}.pt'
-    self.model_checkpoint = 'checkpoints/tacotron1.pt'
-    self.load_model = False
+    checkpoint_dir = 'checkpoints/'
+    checkpoint_template = 'checkpoints/tacotron{}.pt'
+    model_checkpoint = 'checkpoints/tacotron1.pt'
+    load_model = False
 
     # data processing
-    self.valid_ratio = 0.1
-    self.max_audio_length = 222050
-    self.max_chars_length = 187
+    valid_ratio = 0.1
+    max_audio_length = 222050
+    max_chars_length = 187
 
     # melspectogramer params
-    self.sample_rate = 22050
-    self.win_length = 1024
-    self.hop_length = 256
-    self.n_fft = 1024
-    self.f_min = 0
-    self.f_max = 8000
-    self.num_mels = 80
-    self.power = 1.0
-    self.pad_value = 1e-5
+    sample_rate = 22050
+    win_length = 1024
+    hop_length = 256
+    n_fft = 1024
+    f_min = 0
+    f_max = 8000
+    num_mels = 80
+    power = 1.0
+    pad_value = 1e-5
 
     # Tacotron params
-    self.embed_dim = 512
-    self.prenet_dim = 256
-    self.attention_lstm_dim = 1024
-    self.decoder_lstm_dim = 1024
-    self.attention_dim = 128
-    self.attention_temp = 0.08
-    self.encoder_layers = 3
-    self.kernel_size = 5
-    self.postnet_layers = 3
-    self.postnet_channels = 512
-    self.attention_dropout = 0.1
-    self.dropout = 0.5
-    self.max_frames = 870
-    self.threshold = 0.5
+    embed_dim = 512
+    prenet_dim = 256
+    attention_lstm_dim = 1024
+    decoder_lstm_dim = 1024
+    attention_dim = 128
+    attention_temp = 0.08
+    encoder_layers = 3
+    kernel_size = 5
+    postnet_layers = 3
+    postnet_channels = 512
+    attention_dropout = 0.1
+    dropout = 0.5
+    max_frames = 870
+    threshold = 0.5
 
     # optimizer params
-    self.lr = 3e-4
-    self.weight_decay = 1e-4
+    lr = 3e-4
+    weight_decay = 1e-4
 
     # training params
-    self.start_epoch = 1
-    self.num_epochs = 10
+    start_epoch = 1
+    num_epochs = 10
+    batch_size = 64
 
 
 def set_params():

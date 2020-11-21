@@ -9,7 +9,7 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.embedding = nn.Embedding(num_chars, embed_dim)
         self.conv_layers = nn.ModuleList([
-            Conv1dLayer(embed_dim, embed_dim, kernel_size, 'relu', dropout)
+            Conv1DLayer(embed_dim, embed_dim, kernel_size, 'relu', dropout)
             for _ in range(conv_layers)
         ])
 
@@ -31,9 +31,10 @@ class Encoder(nn.Module):
         features = features.transpose(1, 2)
         # features: (batch_size, char_length, embed_dim)
 
-        features = pack_padded_sequence(features, lengths, batch_first=True)
+        features = pack_padded_sequence(features, lengths, batch_first=True,
+                                        enforce_sorted=False)
         features, _ = self.lstm(features)
-        features = pad_packed_sequence(features, batch_first=True)
+        features, _ = pad_packed_sequence(features, batch_first=True)
         # features: (batch_size, char_length, embed_dim)
 
         return features

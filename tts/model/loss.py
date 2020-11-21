@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 
 
@@ -6,10 +7,10 @@ class MaskedLoss(nn.Module):
         super(MaskedLoss, self).__init__()
         self.loss = loss(reduction='none')
 
-    def forward(predicts, targets, mask):
+    def forward(self, predicts, targets, mask):
         weights = torch.ones_like(predicts)
         weights = weights.masked_fill(mask, 0.0)
-        norm = weight.sum().item()
+        norm = weights.sum().item()
         return torch.sum(weights * self.loss(predicts, targets)) / norm
 
 
@@ -21,12 +22,13 @@ class TacotronLoss(nn.Module):
 
     def forward(self, predicts, targets, mask):
         decoder_melspecs, postnet_melspecs, decoder_probs = predicts
-        melspecs, stop_probs = targets
+        melspecs, stop_labels = targets
 
-        decoder_mse = self.mse(decoder_melspecs, melspecs, mask.unsqueeze(1))
-        postnet_mse = self.mse(postnet_melspecs, melspecs, mask.unsqueeze(1))
-        probs_bce = self.bce(decoder_probs, stop_probs, mask)
+        decoder_mse = self.mse(decoder_melspecs, melspecs, mask.unsqueeze(2))
+        postnet_mse = self.mse(postnet_melspecs, melspecs, mask.unsqueeze(2))
+        probs_bce = self.bce(decoder_probs, stop_labels, mask)
 
+        print(decoder_mse.item(), postnet_mse.item(), probs_bce.item())
         loss = decoder_mse + postnet_mse + probs_bce
         return loss
 

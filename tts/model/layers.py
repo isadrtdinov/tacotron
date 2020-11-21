@@ -24,7 +24,7 @@ class Conv1DLayer(nn.Module):
     def forward(self, inputs):
         # inputs: (batch_size, in_channels, max_length)
 
-        outputs = self.batch_norm(self.conv(outputs))
+        outputs = self.batch_norm(self.conv(inputs))
         outputs = self.dropout(self.activation(outputs))
         # outputs: (batch_size, out_channels, max_length)
 
