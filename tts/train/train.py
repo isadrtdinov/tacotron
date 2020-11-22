@@ -80,6 +80,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     text = loader.dataset.alphabet.indices_to_string(chars.squeeze(0).cpu())
     probs_plot = [[frame, prob] for frame, prob in enumerate(predicted_probs, 1)]
+    probs_plot = wandb.Table(data=probs_plot, columns=['frame', 'prob'])
 
     example = {'ground truth spectrogram': wandb.Image(target_melspec),
                'predicted spectrogram': wandb.Image(predicted_melspec),
@@ -110,12 +111,12 @@ def train(model, optimizer, train_loader, valid_loader, params):
             example.update({'train decoder mse': train_loss[0], 'train postnet mse': train_loss[1],
                             'train probs bce': train_loss[2], 'train total loss': train_loss[3],
                             'valid decoder mse': valid_loss[0], 'valid postnet mse': valid_loss[1],
-                            'valid probs bce': train_loss[2], 'valid total loss': valid_loss[3]})
+                            'valid probs bce': valid_loss[2], 'valid total loss': valid_loss[3]})
 
             wandb.log(example)
 
         torch.save({
             'model_state_dict': model.state_dict(),
             'optim_state_dict': optimizer.state_dict(),
-        }, params['checkpoint_template'].format(epoch))
+        }, params.checkpoint_template.format(epoch))
 
