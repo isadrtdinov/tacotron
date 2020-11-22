@@ -10,7 +10,7 @@ class Params:
     vocoder_dir = 'waveglow/'
 
     # wandb params
-    use_wandb = False
+    use_wandb = True
     wandb_project = 'tacotron'
 
     # data location

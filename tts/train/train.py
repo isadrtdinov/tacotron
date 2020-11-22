@@ -67,10 +67,11 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
     chars = chars[:char_length.item()].unsqueeze(0).to(params.device)
     char_length = char_length.unsqueeze(0)
 
-    target_melspec = spectrogramer(waveform)
-    predicted_melspec, predicted_probs = model.inference(chars, char_length)
-    predicted_melspec = predicted_melspec.transpose(1, 2)
-    predicted_waveform = vocoder(predicted_melspec)
+    with torch.no_grad():
+        target_melspec = spectrogramer(waveform)
+        predicted_melspec, predicted_probs = model.inference(chars, char_length)
+        predicted_melspec = predicted_melspec.transpose(1, 2)
+        predicted_waveform = vocoder.inference(predicted_melspec)
 
     target_melspec = target_melspec.squeeze(0).cpu().numpy()
     predicted_melspec = predicted_melspec.squeeze(0).cpu().numpy()
@@ -82,7 +83,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     example = {'ground truth spectrogram': wandb.Image(target_melspec),
                'predicted spectrogram': wandb.Image(predicted_melspec),
-               'predicted audio': wandb.Audio(predicted_waveform),
+               'predicted audio': wandb.Audio(predicted_waveform, sample_rate=params.sample_rate),
                'ground truth text': wandb.Table(data=[[text]], columns=['text']),
                'stop probability': wandb.plot.line(probs_plot, 'frame', 'prob')}
 
@@ -101,16 +102,16 @@ def train(model, optimizer, train_loader, valid_loader, params):
         valid_loss = process_epoch(model, optimizer, criterion, spectrogramer,
                                    valid_loader, params, train=False)
 
-        vocoder = vocoder.to(params.device)
-        example = generate_example(model, spectrogramer, valid_loader, vocoder, params)
-        vocoder = vocoder.cpu()
-
-        example.update({'train decoder mse': train_loss[0], 'train postnet mse': train_loss[1],
-                        'train probs bce': train_loss[2], 'train total loss': train_loss[3],
-                        'valid decoder mse': valid_loss[0], 'valid postnet mse': valid_loss[1],
-                        'valid probs bce': train_loss[2], 'valid total loss': valid_loss[3]})
-
         if params.use_wandb:
+            vocoder = vocoder.to(params.device)
+            example = generate_example(model, spectrogramer, valid_loader, vocoder, params)
+            vocoder = vocoder.cpu()
+
+            example.update({'train decoder mse': train_loss[0], 'train postnet mse': train_loss[1],
+                            'train probs bce': train_loss[2], 'train total loss': train_loss[3],
+                            'valid decoder mse': valid_loss[0], 'valid postnet mse': valid_loss[1],
+                            'valid probs bce': train_loss[2], 'valid total loss': valid_loss[3]})
+
             wandb.log(example)
 
         torch.save({

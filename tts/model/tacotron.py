@@ -39,7 +39,7 @@ class Tacotron(nn.Module):
 
         return decoder_melspecs, postnet_melspecs, decoder_probs
 
-    def inference(self, char, lengths):
+    def inference(self, chars, lengths):
         # chars: (batch_size, char_length)
         # lengths: (batch_size, )
 

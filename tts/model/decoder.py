@@ -134,7 +134,7 @@ class Decoder(nn.Module):
         # V: (batch_size, char_length, embed_dim)
 
         mask = torch.arange(char_length).view(1, char_length) >= lengths.view(batch_size, 1)
-        mask = mask.unsqueeze(1)
+        mask = mask.unsqueeze(1).to(device)
         # mask: (batch_size, 1, char_length)
 
         output_melspecs, output_probs = [], []
