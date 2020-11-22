@@ -12,7 +12,6 @@ class Params:
     # wandb params
     use_wandb = False
     wandb_project = 'tacotron'
-    num_examples = 5
 
     # data location
     data_root = 'ljspeech/wavs/'

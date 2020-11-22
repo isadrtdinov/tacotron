@@ -27,8 +27,9 @@ class TacotronLoss(nn.Module):
         decoder_mse = self.mse(decoder_melspecs, melspecs, mask.unsqueeze(2))
         postnet_mse = self.mse(postnet_melspecs, melspecs, mask.unsqueeze(2))
         probs_bce = self.bce(decoder_probs, stop_labels, mask)
-
-        print(decoder_mse.item(), postnet_mse.item(), probs_bce.item())
         loss = decoder_mse + postnet_mse + probs_bce
-        return loss
+
+        components = (decoder_mse.item(), postnet_mse.item(),
+                      probs_bce.item(), loss.item())
+        return loss, components
 
