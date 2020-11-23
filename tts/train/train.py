@@ -99,6 +99,8 @@ def train(model, optimizer, train_loader, valid_loader, params):
     spectrogramer = MelSpectrogram(params).to(params.device)
 
     for epoch in range(params.start_epoch, params.start_epoch + params.num_epochs):
+        model.decoder.teacher_forcing = params.teacher_forcing(epoch)
+
         train_loss = process_epoch(model, optimizer, criterion, spectrogramer,
                                    train_loader, params, train=True)
 
@@ -122,4 +124,3 @@ def train(model, optimizer, train_loader, valid_loader, params):
             'optim_state_dict': optimizer.state_dict(),
         }, params.checkpoint_template.format(epoch))
 
-        return

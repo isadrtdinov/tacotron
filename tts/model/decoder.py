@@ -9,8 +9,7 @@ class Decoder(nn.Module):
     def __init__(self, num_mels=80, prenet_dim=256, embed_dim=512,
                  attention_lstm_dim=1024, decoder_lstm_dim=1024,
                  attention_dim=128, attention_temp=0.08, attention_dropout=0.1,
-                 dropout=0.5, teacher_forcing=0.5, max_frames=870, threshold=0.5,
-                 frames_per_char=5.75):
+                 dropout=0.5, max_frames=870, threshold=0.5, frames_per_char=5.75):
         super(Decoder, self).__init__()
 
         self.num_mels = num_mels
@@ -19,10 +18,10 @@ class Decoder(nn.Module):
         self.attention_dim = attention_dim
         self.attention_lstm_dim = attention_lstm_dim
         self.decoder_lstm_dim = decoder_lstm_dim
-        self.teacher_forcing = teacher_forcing
         self.max_frames = max_frames
         self.threshold = threshold
         self.frames_per_char = frames_per_char
+        self.teacher_forcing = None
 
         self.prenet = PreNet(dims=[num_mels, prenet_dim, prenet_dim], dropout=dropout)
         self.attention_lstm = nn.LSTMCell(input_size=prenet_dim + embed_dim,
@@ -182,7 +181,7 @@ class Decoder(nn.Module):
             output_melspecs += [decoder_outputs.unsqueeze(1)]
             output_probs += [stop_probs]
 
-            if torch.all(stop_probs > self.threshold):
+            if i > 0 and torch.all(stop_probs > self.threshold):
                 break
 
         output_melspecs = torch.cat(output_melspecs, dim=1)

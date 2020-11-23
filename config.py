@@ -20,7 +20,7 @@ class Params:
     # checkpoints
     checkpoint_dir = 'checkpoints/'
     checkpoint_template = 'checkpoints/tacotron{}.pt'
-    model_checkpoint = 'checkpoints/tacotron20.pt'
+    model_checkpoint = 'checkpoints/tacotron1.pt'
     load_model = False
 
     # data processing
@@ -52,20 +52,23 @@ class Params:
     postnet_channels = 512
     attention_dropout = 0.1
     dropout = 0.5
-    teacher_forcing = 0.5
     max_frames = 870
     threshold = 0.5
     frames_per_char = 5.75
     labels_temp = 0.08
 
     # optimizer params
-    lr = 2e-4
+    lr = 3e-4
     weight_decay = 1e-4
 
     # training params
     start_epoch = 1
-    num_epochs = 10
+    num_epochs = 20
     batch_size = 64
+
+    # decreasing teacher forcing rate
+    def teacher_forcing(self, epoch):
+        return 0.8 - epoch * 0.04
 
 
 def set_params():
