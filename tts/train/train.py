@@ -69,7 +69,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     with torch.no_grad():
         target_melspec = spectrogramer(waveform)
-        _, predicted_melspec, predicted_probs = model(chars, char_length, target_melspec.transpose(1, 2))
+        predicted_melspec, predicted_probs = model.inference(chars, char_length)
         predicted_melspec = predicted_melspec.transpose(1, 2)
         predicted_waveform = vocoder.inference(predicted_melspec)
 

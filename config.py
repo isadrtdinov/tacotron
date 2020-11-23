@@ -1,6 +1,6 @@
 class Params:
     # the most important parameter
-    random_seed = 808808
+    random_seed = 808809
 
     # system params
     verbose = True
