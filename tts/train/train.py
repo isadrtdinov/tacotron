@@ -75,6 +75,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     target_melspec = target_melspec.squeeze(0).cpu().numpy()
     predicted_melspec = predicted_melspec.squeeze(0).cpu().numpy()
+    waveform = waveform.squeeze(0).cpu().numpy()
     predicted_waveform = predicted_waveform.squeeze(0).cpu().numpy()
     predicted_probs = predicted_probs.squeeze(0).cpu().numpy()
 
@@ -83,6 +84,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
     probs_plot = wandb.Table(data=probs_plot, columns=['frame', 'prob'])
 
     example = {'ground truth spectrogram': wandb.Image(target_melspec),
+               'ground truth audio': wandb.Audio(waveform, sample_rate=params.sample_rate),
                'predicted spectrogram': wandb.Image(predicted_melspec),
                'predicted audio': wandb.Audio(predicted_waveform, sample_rate=params.sample_rate),
                'ground truth text': wandb.Table(data=[[text]], columns=['text']),
@@ -97,12 +99,12 @@ def train(model, optimizer, train_loader, valid_loader, params):
     spectrogramer = MelSpectrogram(params).to(params.device)
 
     for epoch in range(params.start_epoch, params.start_epoch + params.num_epochs):
-        #train_loss = process_epoch(model, optimizer, criterion, spectrogramer,
-        #                           train_loader, params, train=True)
+        train_loss = process_epoch(model, optimizer, criterion, spectrogramer,
+                                   train_loader, params, train=True)
 
-        #valid_loss = process_epoch(model, optimizer, criterion, spectrogramer,
-        #                           valid_loader, params, train=False)
-        train_loss, valid_loss = [0] * 4, [0] * 4
+        valid_loss = process_epoch(model, optimizer, criterion, spectrogramer,
+                                   valid_loader, params, train=False)
+
         if params.use_wandb:
             vocoder = vocoder.to(params.device)
             example = generate_example(model, spectrogramer, valid_loader, vocoder, params)

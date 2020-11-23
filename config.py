@@ -21,7 +21,7 @@ class Params:
     checkpoint_dir = 'checkpoints/'
     checkpoint_template = 'checkpoints/tacotron{}.pt'
     model_checkpoint = 'checkpoints/tacotron20.pt'
-    load_model = True
+    load_model = False
 
     # data processing
     valid_ratio = 0.1
@@ -63,7 +63,7 @@ class Params:
     weight_decay = 1e-4
 
     # training params
-    start_epoch = 21
+    start_epoch = 1
     num_epochs = 10
     batch_size = 64
 
