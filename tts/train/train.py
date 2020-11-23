@@ -69,7 +69,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     with torch.no_grad():
         target_melspec = spectrogramer(waveform)
-        predicted_melspec, predicted_probs = model.inference(chars, char_length)
+        _, predicted_melspec, predicted_probs = model(chars, char_length, target_melspec.transpose(1, 2))
         predicted_melspec = predicted_melspec.transpose(1, 2)
         predicted_waveform = vocoder.inference(predicted_melspec)
 
@@ -97,12 +97,12 @@ def train(model, optimizer, train_loader, valid_loader, params):
     spectrogramer = MelSpectrogram(params).to(params.device)
 
     for epoch in range(params.start_epoch, params.start_epoch + params.num_epochs):
-        train_loss = process_epoch(model, optimizer, criterion, spectrogramer,
-                                   train_loader, params, train=True)
+        #train_loss = process_epoch(model, optimizer, criterion, spectrogramer,
+        #                           train_loader, params, train=True)
 
-        valid_loss = process_epoch(model, optimizer, criterion, spectrogramer,
-                                   valid_loader, params, train=False)
-
+        #valid_loss = process_epoch(model, optimizer, criterion, spectrogramer,
+        #                           valid_loader, params, train=False)
+        train_loss, valid_loss = [0] * 4, [0] * 4
         if params.use_wandb:
             vocoder = vocoder.to(params.device)
             example = generate_example(model, spectrogramer, valid_loader, vocoder, params)
@@ -120,3 +120,4 @@ def train(model, optimizer, train_loader, valid_loader, params):
             'optim_state_dict': optimizer.state_dict(),
         }, params.checkpoint_template.format(epoch))
 
+        return

@@ -34,7 +34,7 @@ class Tacotron(nn.Module):
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 
-        postnet_melspecs = self.postnet(decoder_melspecs)
+        postnet_melspecs = decoder_melspecs + self.postnet(decoder_melspecs)
         # postnet_melspecs: (batch_size, frames_length, num_mels)
 
         return decoder_melspecs, postnet_melspecs, decoder_probs
@@ -50,7 +50,7 @@ class Tacotron(nn.Module):
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 
-        postnet_melspecs = self.postnet(decoder_melspecs)
+        postnet_melspecs = decoder_melspecs + self.postnet(decoder_melspecs)
         # postnet_melspecs: (batch_size, frames_length, num_mels)
 
         return postnet_melspecs, decoder_probs

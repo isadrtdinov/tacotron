@@ -1,6 +1,6 @@
 class Params:
     # the most important parameter
-    random_seed = 800008
+    random_seed = 808808
 
     # system params
     verbose = True
@@ -20,8 +20,8 @@ class Params:
     # checkpoints
     checkpoint_dir = 'checkpoints/'
     checkpoint_template = 'checkpoints/tacotron{}.pt'
-    model_checkpoint = 'checkpoints/tacotron1.pt'
-    load_model = False
+    model_checkpoint = 'checkpoints/tacotron20.pt'
+    load_model = True
 
     # data processing
     valid_ratio = 0.1
@@ -56,11 +56,11 @@ class Params:
     threshold = 0.5
 
     # optimizer params
-    lr = 3e-4
+    lr = 2e-4
     weight_decay = 1e-4
 
     # training params
-    start_epoch = 1
+    start_epoch = 21
     num_epochs = 10
     batch_size = 64
 
