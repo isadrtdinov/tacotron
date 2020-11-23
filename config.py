@@ -52,6 +52,7 @@ class Params:
     postnet_channels = 512
     attention_dropout = 0.1
     dropout = 0.5
+    teacher_forcing = 0.5
     max_frames = 870
     threshold = 0.5
     frames_per_char = 5.75

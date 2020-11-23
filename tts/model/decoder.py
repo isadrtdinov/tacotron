@@ -1,3 +1,4 @@
+import random
 import torch
 from torch import nn
 from .attention import Attention
@@ -8,7 +9,8 @@ class Decoder(nn.Module):
     def __init__(self, num_mels=80, prenet_dim=256, embed_dim=512,
                  attention_lstm_dim=1024, decoder_lstm_dim=1024,
                  attention_dim=128, attention_temp=0.08, attention_dropout=0.1,
-                 dropout=0.5, max_frames=870, threshold=0.5, frames_per_char=5.75):
+                 dropout=0.5, teacher_forcing=0.5, max_frames=870, threshold=0.5,
+                 frames_per_char=5.75):
         super(Decoder, self).__init__()
 
         self.num_mels = num_mels
@@ -17,6 +19,7 @@ class Decoder(nn.Module):
         self.attention_dim = attention_dim
         self.attention_lstm_dim = attention_lstm_dim
         self.decoder_lstm_dim = decoder_lstm_dim
+        self.teacher_forcing = teacher_forcing
         self.max_frames = max_frames
         self.threshold = threshold
         self.frames_per_char = frames_per_char
@@ -61,11 +64,6 @@ class Decoder(nn.Module):
         decoder_outputs, attention_context, attention_hidden, attention_cell, \
         decoder_hidden, decoder_cell = self.init_states(batch_size, device)
 
-        # PreNet for ground truth spectogram
-        prenet_inputs = torch.cat([decoder_outputs.unsqueeze(1), melspecs[:, :-1]], dim=1)
-        prenet_outputs = self.prenet(prenet_inputs)
-        # prenet_outputs: (batch_size, frames_length, prenet_dim)
-
         # prepare K, V and mask for attention
         K = self.attention.WK(encoder_outputs)
         V = self.attention.WV(encoder_outputs)
@@ -78,8 +76,16 @@ class Decoder(nn.Module):
 
         output_melspecs, output_probs = [], []
         for i in range(frames_length):
+            # teacher forcing
+            if i > 0 and random.random() < self.teacher_forcing:
+                decoder_outputs = melspecs[:, i - 1]
+
+            # PreNet for previous step
+            prenet_outputs = self.prenet(decoder_outputs)
+            # prenet_outputs: (batch_size, prenet_dim)
+
             # attention LSTM
-            attention_lstm_inputs = torch.cat([prenet_outputs[:, i], attention_context], dim=1)
+            attention_lstm_inputs = torch.cat([prenet_outputs, attention_context], dim=1)
             # attention_lstm_inputs: (batch_size, prenet_dim + embed_dim)
 
             attention_hidden, attention_cell = self.attention_lstm(attention_lstm_inputs,
