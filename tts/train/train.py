@@ -6,17 +6,17 @@ from ..utils.vocoder import Vocoder
 from ..utils.spectrogram import MelSpectrogram, get_spectrogram_lengths
 
 
-def process_batch(model, optimizer, criterion, batch, train=True):
+def process_batch(model, optimizer, criterion, batch, params, train=True):
     chars, char_lengths, melspecs, melspec_lengths = batch
 
     batch_size, frames_length, _ = melspecs.shape
     mask = torch.arange(frames_length).view(1, frames_length) >= \
            melspec_lengths.view(batch_size, 1)
-    mask = mask.to(chars.device)
+    mask = mask.to(params.device)
 
-    stop_labels = torch.arange(frames_length).view(1, frames_length) >= \
-                  (melspec_lengths - 1).view(batch_size, 1)
-    stop_labels = stop_labels.to(torch.float).to(chars.device)
+    stop_labels = torch.arange(1, frames_length + 1).view(1, frames_length) / \
+                  melspec_lengths.view(batch_size, 1) - 1.0
+    stop_labels = torch.exp(-stop_labels ** 2 / params.labels_temp).to(params.device)
 
     optimizer.zero_grad()
     with torch.set_grad_enabled(train):
@@ -46,7 +46,7 @@ def process_epoch(model, optimizer, criterion, spectrogramer, loader, params, tr
         melspec_lengths = get_spectrogram_lengths(audio_lengths, params)
 
         batch = (chars, char_lengths, melspecs, melspec_lengths)
-        components = process_batch(model, optimizer, criterion, batch, train)
+        components = process_batch(model, optimizer, criterion, batch, params, train)
 
         running_loss = [cumulative_loss + loss * waveforms.shape[0]
                         for cumulative_loss, loss in zip(running_loss, components)]

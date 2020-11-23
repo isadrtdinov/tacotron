@@ -54,6 +54,8 @@ class Params:
     dropout = 0.5
     max_frames = 870
     threshold = 0.5
+    frames_per_char = 5.75
+    labels_temp = 0.08
 
     # optimizer params
     lr = 2e-4
