@@ -92,9 +92,9 @@ class Decoder(nn.Module):
             # attention_hidden, attention_cell: (batch_size, attention_lstm_dim)
 
             step = (i + 1) / (char_length * self.frames_per_char)
-            attention_context, attention_score = self.attention(query=attention_hidden.unsqueeze(1),
+            attention_context, attention_probs = self.attention(query=attention_hidden.unsqueeze(1),
                                                                 K=K, V=V, step=step, mask=mask)
-            attention += [attention_score]
+            attention += [attention_probs]
             attention_context = attention_context.squeeze(1)
             # attention_context: (batch_size, embed_dim)
 
@@ -161,9 +161,9 @@ class Decoder(nn.Module):
             # attention_hidden, attention_cell: (batch_size, attention_lstm_dim)
 
             step = (i + 1) / (char_length * self.frames_per_char)
-            attention_context, attention_score = self.attention(query=attention_hidden.unsqueeze(1),
+            attention_context, attention_probs = self.attention(query=attention_hidden.unsqueeze(1),
                                                                 K=K, V=V, step=step, mask=mask)
-            attention += [attention_score]
+            attention += [attention_probs]
             attention_context = attention_context.squeeze(1)
             # attention_context: (batch_size, embed_dim)
 

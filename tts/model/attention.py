@@ -25,24 +25,26 @@ class Attention(nn.Module):
         # Q: (batch_size, 1, attention_dim)
 
         norm_factor = math.sqrt(Q.shape[-1])
-        attention = torch.bmm(Q, K.transpose(1, 2)) / norm_factor
-        # attention: (batch_size, 1, char_length)
+        attention_score = torch.bmm(Q, K.transpose(1, 2)) / norm_factor
+        # attention_score: (batch_size, 1, char_length)
+
+        if mask is not None:
+            attention_score = attention_score.masked_fill(mask, -math.inf)
+
+        attention_probs = nn.functional.softmax(attention_score, dim=-1)
+        #attention_probs: (batch_size, 1, char_length)
 
         if step is not None:
-            N = attention.shape[-1]
+            N = attention_probs.shape[-1]
             frames_pos = torch.tensor([step]).view(1, 1)
             chars_pos = (torch.arange(1, N + 1) / N).view(1, N)
 
             guide_mask = torch.exp(-(frames_pos - chars_pos) ** 2 / self.temp)
-            attention = attention * guide_mask.to(attention.device)
+            attention_probs = attention_probs * guide_mask.to(attention_probs.device)
 
-        if mask is not None:
-            attention = attention.masked_fill(mask, -math.inf)
-
-        attention_score = nn.functional.softmax(attention, dim=-1)
-        attention_score = self.dropout(attention_score)
-        soft_argmax = torch.bmm(attention_score, V)
+        attention_probs = self.dropout(attention_probs)
+        soft_argmax = torch.bmm(attention_probs, V)
         # soft_argmax: (batch_size, length, attention_dim)
 
-        return soft_argmax, attention_score
+        return soft_argmax, attention_probs
 

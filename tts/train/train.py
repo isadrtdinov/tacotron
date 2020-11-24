@@ -78,7 +78,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
     waveform = waveform.squeeze(0).cpu().numpy()
     predicted_waveform = predicted_waveform.squeeze(0).cpu().numpy()
     predicted_probs = predicted_probs.squeeze(0).cpu().numpy()
-    attention = attention.squeeze(0).cpu().numpy()
+    attention = torch.log(attention.transpose(1, 2).clamp(min=1e-10)).squeeze(0).cpu().numpy()
 
     text = loader.dataset.alphabet.indices_to_string(chars.squeeze(0).cpu())
     probs_plot = [[frame, prob] for frame, prob in enumerate(predicted_probs, 1)]

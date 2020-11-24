@@ -53,7 +53,7 @@ class Params:
     attention_dropout = 0.1
     dropout = 0.5
     max_frames = 870
-    threshold = 0.5
+    threshold = 0.95
     frames_per_char = 5.75
     labels_temp = 0.08
 
@@ -68,7 +68,7 @@ class Params:
 
     # decreasing teacher forcing rate
     def teacher_forcing(self, epoch):
-        return 0.8 - epoch * 0.04
+        return 1.0
 
 
 def set_params():
