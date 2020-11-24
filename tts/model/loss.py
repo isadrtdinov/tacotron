@@ -21,7 +21,7 @@ class TacotronLoss(nn.Module):
         self.bce = MaskedLoss(nn.BCELoss)
 
     def forward(self, predicts, targets, mask):
-        decoder_melspecs, postnet_melspecs, decoder_probs = predicts
+        decoder_melspecs, postnet_melspecs, decoder_probs, _ = predicts
         melspecs, stop_labels = targets
 
         decoder_mse = self.mse(decoder_melspecs, melspecs, mask.unsqueeze(2))

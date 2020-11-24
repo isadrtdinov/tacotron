@@ -69,7 +69,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
     with torch.no_grad():
         target_melspec = spectrogramer(waveform)
-        predicted_melspec, predicted_probs = model.inference(chars, char_length)
+        predicted_melspec, predicted_probs, attention = model.inference(chars, char_length)
         predicted_melspec = predicted_melspec.transpose(1, 2)
         predicted_waveform = vocoder.inference(predicted_melspec)
 
@@ -78,6 +78,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
     waveform = waveform.squeeze(0).cpu().numpy()
     predicted_waveform = predicted_waveform.squeeze(0).cpu().numpy()
     predicted_probs = predicted_probs.squeeze(0).cpu().numpy()
+    attention = attention.squeeze(0).cpu().numpy()
 
     text = loader.dataset.alphabet.indices_to_string(chars.squeeze(0).cpu())
     probs_plot = [[frame, prob] for frame, prob in enumerate(predicted_probs, 1)]
@@ -88,7 +89,8 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
                'predicted spectrogram': wandb.Image(predicted_melspec),
                'predicted audio': wandb.Audio(predicted_waveform, sample_rate=params.sample_rate),
                'ground truth text': wandb.Table(data=[[text]], columns=['text']),
-               'stop probability': wandb.plot.line(probs_plot, 'frame', 'prob')}
+               'stop probability': wandb.plot.line(probs_plot, 'frame', 'prob'),
+               'attention': wandb.Image(attention)}
 
     return example
 

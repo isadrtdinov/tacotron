@@ -73,7 +73,7 @@ class Decoder(nn.Module):
         mask = mask.unsqueeze(1).to(device)
         # mask: (batch_size, 1, char_length)
 
-        output_melspecs, output_probs = [], []
+        output_melspecs, output_probs, attention = [], [], []
         for i in range(frames_length):
             # teacher forcing
             if i > 0 and random.random() < self.teacher_forcing:
@@ -92,8 +92,9 @@ class Decoder(nn.Module):
             # attention_hidden, attention_cell: (batch_size, attention_lstm_dim)
 
             step = (i + 1) / (char_length * self.frames_per_char)
-            attention_context = self.attention(query=attention_hidden.unsqueeze(1),
-                                               K=K, V=V, step=step, mask=mask)
+            attention_context, attention_score = self.attention(query=attention_hidden.unsqueeze(1),
+                                                                K=K, V=V, step=step, mask=mask)
+            attention += [attention_score]
             attention_context = attention_context.squeeze(1)
             # attention_context: (batch_size, embed_dim)
 
@@ -117,10 +118,12 @@ class Decoder(nn.Module):
 
         output_melspecs = torch.cat(output_melspecs, dim=1)
         output_probs = torch.cat(output_probs, dim=1)
+        attention = torch.cat(attention, dim=1)
         # output_melspecs: (batch_size, frames_length, prenet_dim)
         # output_probs: (batch_size, frames_length)
+        # attention: (batch_size, frames_length, char_length)
 
-        return output_melspecs, output_probs
+        return output_melspecs, output_probs, attention
 
     def inference(self, encoder_outputs, lengths):
         # encoder_outputs: (batch_size, char_length, embed_dim)
@@ -143,7 +146,7 @@ class Decoder(nn.Module):
         mask = mask.unsqueeze(1).to(device)
         # mask: (batch_size, 1, char_length)
 
-        output_melspecs, output_probs = [], []
+        output_melspecs, output_probs, attention = [], [], []
         for i in range(self.max_frames):
             # PreNet for previous step
             prenet_outputs = self.prenet(decoder_outputs)
@@ -158,8 +161,9 @@ class Decoder(nn.Module):
             # attention_hidden, attention_cell: (batch_size, attention_lstm_dim)
 
             step = (i + 1) / (char_length * self.frames_per_char)
-            attention_context = self.attention(query=attention_hidden.unsqueeze(1),
-                                               K=K, V=V, step=step, mask=mask)
+            attention_context, attention_score = self.attention(query=attention_hidden.unsqueeze(1),
+                                                                K=K, V=V, step=step, mask=mask)
+            attention += [attention_score]
             attention_context = attention_context.squeeze(1)
             # attention_context: (batch_size, embed_dim)
 
@@ -186,8 +190,10 @@ class Decoder(nn.Module):
 
         output_melspecs = torch.cat(output_melspecs, dim=1)
         output_probs = torch.cat(output_probs, dim=1)
+        attention = torch.cat(attention, dim=1)
         # output_melspecs: (batch_size, frames_length, prenet_dim)
         # output_probs: (batch_size, frames_length)
+        # attention: (batch_size, frames_length, char_length)
 
-        return output_melspecs, output_probs
+        return output_melspecs, output_probs, attention
 

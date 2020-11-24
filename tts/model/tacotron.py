@@ -30,14 +30,14 @@ class Tacotron(nn.Module):
         encoder_outputs = self.encoder(chars, lengths)
         # encoder_outputs: (batch_size, char_length, embed_dim)
 
-        decoder_melspecs, decoder_probs = self.decoder(encoder_outputs, lengths, melspecs)
+        decoder_melspecs, decoder_probs, attention = self.decoder(encoder_outputs, lengths, melspecs)
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 
         postnet_melspecs = decoder_melspecs + self.postnet(decoder_melspecs)
         # postnet_melspecs: (batch_size, frames_length, num_mels)
 
-        return decoder_melspecs, postnet_melspecs, decoder_probs
+        return decoder_melspecs, postnet_melspecs, decoder_probs, attention
 
     def inference(self, chars, lengths):
         # chars: (batch_size, char_length)
@@ -46,14 +46,14 @@ class Tacotron(nn.Module):
         encoder_outputs = self.encoder(chars, lengths)
         # encoder_outputs: (batch_size, char_length, embed_dim)
 
-        decoder_melspecs, decoder_probs = self.decoder.inference(encoder_outputs, lengths)
+        decoder_melspecs, decoder_probs, attention = self.decoder.inference(encoder_outputs, lengths)
         # decoder_melspecs: (batch_size, frames_length, num_mels)
         # decoder_probs: (batch_size, frames_length)
 
         postnet_melspecs = decoder_melspecs + self.postnet(decoder_melspecs)
         # postnet_melspecs: (batch_size, frames_length, num_mels)
 
-        return postnet_melspecs, decoder_probs
+        return postnet_melspecs, decoder_probs, attention
 
 
 def tacotron(num_chars, params):

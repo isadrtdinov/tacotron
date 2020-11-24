@@ -44,5 +44,5 @@ class Attention(nn.Module):
         soft_argmax = torch.bmm(attention_score, V)
         # soft_argmax: (batch_size, length, attention_dim)
 
-        return soft_argmax
+        return soft_argmax, attention_score
 
