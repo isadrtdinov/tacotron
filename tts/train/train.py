@@ -34,7 +34,7 @@ def process_batch(model, optimizer, criterion, batch, params, train=True):
 def process_epoch(model, optimizer, criterion, spectrogramer, loader, params, train=True):
     model.train() if train else model.eval()
 
-    running_loss = [0.0] * 4
+    running_loss = [0.0] * 5
 
     for raw_batch in loader:
         waveforms, chars, audio_lengths, char_lengths = raw_batch
@@ -96,7 +96,7 @@ def generate_example(model, spectrogramer, loader, vocoder, params):
 
 
 def train(model, optimizer, train_loader, valid_loader, params):
-    criterion = TacotronLoss()
+    criterion = TacotronLoss(params.guide_temp, params.attention_coef)
     vocoder = Vocoder(params.vocoder_file)
     spectrogramer = MelSpectrogram(params).to(params.device)
 
@@ -115,9 +115,11 @@ def train(model, optimizer, train_loader, valid_loader, params):
             vocoder = vocoder.cpu()
 
             example.update({'train decoder mse': train_loss[0], 'train postnet mse': train_loss[1],
-                            'train probs bce': train_loss[2], 'train total loss': train_loss[3],
+                            'train probs bce': train_loss[2], 'train attention loss': train_loss[3],
+                            'train total loss': train_loss[4],
                             'valid decoder mse': valid_loss[0], 'valid postnet mse': valid_loss[1],
-                            'valid probs bce': valid_loss[2], 'valid total loss': valid_loss[3]})
+                            'valid probs bce': valid_loss[2], 'valid attention loss': valid_loss[3],
+                            'valid total loss': valid_loss[4]})
 
             wandb.log(example)
 

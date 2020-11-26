@@ -20,8 +20,8 @@ class Params:
     # checkpoints
     checkpoint_dir = 'checkpoints/'
     checkpoint_template = 'checkpoints/tacotron{}.pt'
-    model_checkpoint = 'checkpoints/tacotron1.pt'
-    load_model = False
+    model_checkpoint = 'checkpoints/tacotron45.pt'
+    load_model = True
 
     # data processing
     valid_ratio = 0.1
@@ -45,7 +45,6 @@ class Params:
     attention_lstm_dim = 1024
     decoder_lstm_dim = 1024
     attention_dim = 128
-    attention_temp = 0.08
     encoder_layers = 3
     kernel_size = 5
     postnet_layers = 3
@@ -57,13 +56,17 @@ class Params:
     frames_per_char = 5.75
     labels_temp = 0.08
 
+    # loss params
+    guide_temp = 0.08
+    attention_coef = 100
+
     # optimizer params
-    lr = 3e-4
+    lr = 1e-4
     weight_decay = 1e-4
 
     # training params
-    start_epoch = 1
-    num_epochs = 20
+    start_epoch = 46
+    num_epochs = 10
     batch_size = 64
 
     # decreasing teacher forcing rate

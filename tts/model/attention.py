@@ -5,9 +5,8 @@ from torch import nn
 
 class Attention(nn.Module):
     def __init__(self, embed_dim=512, attention_dim=128,
-                 attention_lstm_dim=1024, temp=0.08, dropout=0.1):
+                 attention_lstm_dim=1024, dropout=0.1):
         super(Attention, self).__init__()
-        self.temp = temp
 
         self.WQ = nn.Linear(attention_lstm_dim, attention_dim, bias=False)
         self.WK = nn.Linear(embed_dim, attention_dim, bias=False)
@@ -15,7 +14,7 @@ class Attention(nn.Module):
 
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, query, K, V, step=None, mask=None):
+    def forward(self, query, K, V, mask=None):
         # query: (batch_size, 1, attention_lstm_dim)
         # K = WK(key): (batch_size, char_length, attention_dim)
         # V = WV(value): (batch_size, char_length, embed_dim)
@@ -32,18 +31,9 @@ class Attention(nn.Module):
             attention_score = attention_score.masked_fill(mask, -math.inf)
 
         attention_probs = nn.functional.softmax(attention_score, dim=-1)
-        #attention_probs: (batch_size, 1, char_length)
-
-        if step is not None:
-            N = attention_probs.shape[-1]
-            frames_pos = torch.tensor([step]).view(1, 1)
-            chars_pos = (torch.arange(1, N + 1) / N).view(1, N)
-
-            guide_mask = torch.exp(-(frames_pos - chars_pos) ** 2 / self.temp)
-            attention_probs = attention_probs * guide_mask.to(attention_probs.device)
-
         attention_probs = self.dropout(attention_probs)
         soft_argmax = torch.bmm(attention_probs, V)
+        # attention_probs: (batch_size, 1, char_length)
         # soft_argmax: (batch_size, length, attention_dim)
 
         return soft_argmax, attention_probs
