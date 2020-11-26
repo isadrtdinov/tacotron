@@ -72,6 +72,10 @@ class Params:
     def teacher_forcing(self, epoch):
         return 1.0
 
+    # test params
+    example_text = 'example.txt'
+    example_audio = 'example.wav'
+
 
 def set_params():
     return Params()
