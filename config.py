@@ -20,7 +20,7 @@ class Params:
     # checkpoints
     checkpoint_dir = 'checkpoints/'
     checkpoint_template = 'checkpoints/tacotron{}.pt'
-    model_checkpoint = 'checkpoints/tacotron45.pt'
+    model_checkpoint = 'checkpoints/tacotron65.pt'
     load_model = True
 
     # data processing
