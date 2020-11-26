@@ -8,6 +8,6 @@ def test(model, text, params):
     length = torch.tensor([text.shape[1]])
 
     melspec, _, _ = model.inference(text, length)
-    waveform = vocoder.inference(melspec.transpose(1, 2)).squeeze(0).cpu()
+    waveform = vocoder.inference(melspec.transpose(1, 2)).cpu()
     return waveform
 
