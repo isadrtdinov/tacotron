@@ -3,6 +3,7 @@ import string
 import warnings
 import torch
 import torchaudio
+import soundfile as sf
 from tts.model import tacotron
 from tts.test import test
 from tts.utils import Alphabet
@@ -29,7 +30,7 @@ def main():
 
     # generate and save audio
     waveform = test(model, text, params)
-    torchaudio.save(params.example_audio, waveform, params.sample_rate)
+    sf.write(params.example_audio, waveform, params.sample_rate)
 
 
 if __name__ == '__main__':
