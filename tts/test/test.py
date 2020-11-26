@@ -9,5 +9,5 @@ def test(model, text, params):
 
     melspec, _, _ = model.inference(text, length)
     waveform = vocoder.inference(melspec.transpose(1, 2))
-    return waveform.squeeze(0).cpu().numpy()
+    return waveform.squeeze(0).clamp(-1.0, 1.0).cpu().numpy()
 
