@@ -4,6 +4,7 @@ waveglow/
 vocoder.pt
 ljspeech/
 wandb/
+tacotron.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
